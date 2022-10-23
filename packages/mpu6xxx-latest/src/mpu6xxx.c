@@ -19,11 +19,11 @@
 #define DBG_LVL DBG_INFO
 #include <rtdbg.h>
 
-#include "mpu6xxx.h"
-#include "mpu6xxx_reg.h"
+#include <packages/mpu6xxx-latest/inc/mpu6xxx.h>
+#include <packages/mpu6xxx-latest/inc/mpu6xxx_reg.h>
 
 #ifdef PKG_USING_MPU6XXX_MAG
-#include "ak8963_reg.h"
+#include <packages/mpu6xxx-latest/inc/ak8963_reg.h>
 #endif
 
 #define MPU6XXX_ACCEL_SEN     (16384)

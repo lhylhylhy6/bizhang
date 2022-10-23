@@ -10,6 +10,8 @@
 #ifndef APPLICATIONS_HCSR04_H_
 #define APPLICATIONS_HCSR04_H_
 
-
+#include <rtthread.h>
+#include <rtdevice.h>
+#include <board.h>
 
 #endif /* APPLICATIONS_HCSR04_H_ */

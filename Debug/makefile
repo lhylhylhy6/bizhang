@@ -21,6 +21,7 @@ RM := rm -rf
 -include rt-thread/components/drivers/misc/subdir.mk
 -include rt-thread/components/drivers/ipc/subdir.mk
 -include rt-thread/components/drivers/i2c/subdir.mk
+-include packages/rt_vsnprintf_full-latest/subdir.mk
 -include packages/mpu6xxx-latest/src/subdir.mk
 -include libraries/STM32F4xx_HAL_Driver/Src/Legacy/subdir.mk
 -include libraries/STM32F4xx_HAL_Driver/Src/subdir.mk
@@ -62,7 +63,7 @@ all: rtthread.elf secondary-outputs
 
 # 工具调用
 rtthread.elf: $(OBJS) $(USER_OBJS)
-	arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -O0 -ffunction-sections -fdata-sections -Wall  -g -gdwarf-2 -T "D:\RT-ThreadStudio\project\bizhang\linkscripts\STM32F407ZE\link.lds" -Xlinker --gc-sections -Wl,-Map,"rtthread.map" -Xlinker --cref -o "rtthread.elf" $(OBJS) $(USER_OBJS) $(LIBS)
+	arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -O0 -ffunction-sections -fdata-sections -Wall  -g -gdwarf-2 -T "C:\Users\10091\Desktop\1\bizhang\linkscripts\STM32F407ZE\link.lds" -Xlinker --gc-sections -Wl,-Map,"rtthread.map" -Xlinker --cref -o "rtthread.elf" $(OBJS) $(USER_OBJS) $(LIBS)
 
 rtthread.bin: rtthread.elf
 	arm-none-eabi-objcopy -O binary "rtthread.elf"  "rtthread.bin"

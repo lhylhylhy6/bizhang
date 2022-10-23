@@ -22,9 +22,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <packages/mpu6xxx-latest/inc/sensor_inven_mpu6xxx.h>
 #include "inv_mpu.h"
 #include "inv_mpu_dmp_motion_driver.h"
-#include "sensor_inven_mpu6xxx.h"
 #include "mpu6050.h"
 #include <stm32f4xx.h>
 #include <rtthread.h>
