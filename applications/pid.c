@@ -23,10 +23,12 @@ extern struct rt_device_pwm * pwm2 ;
 rt_int32_t pwm_l,pwm_r;
 rt_int32_t speed;
 int middle = 162;
-float kp = 10;
+float kp = 180089;
 float ki = -2.33;
 float kd = 81;
 float dia=0;
+
+int val_flag=1;
 
 rt_thread_t pid_thread = RT_NULL;
 rt_mutex_t pid_completion;
@@ -74,9 +76,16 @@ void pwm_abs(rt_int32_t pwm_1,rt_int32_t pwm_2)
 float error=0,ierror=0,derror=0,errorlast=0;
 void pid_compute(int val)
 {
+    if(val_flag==1)
+    {
+        middle=160;
+    }
+    else if(val_flag==2)
+    {
+        middle=7;
+    }
 
-
-    error = middle*1.0 -val;
+    error = middle*1.0 - val;
     ierror=ierror+error;
     derror=error-errorlast;
     errorlast=error;
@@ -106,6 +115,7 @@ int pid_set(int argc,char **argv)
 MSH_CMD_EXPORT(pid_set,pid parameter set);
 
 rt_uint32_t num=0;
+extern float right_val;
 void pid_thread_entry(void *parameter)
 {
 
@@ -114,7 +124,12 @@ void pid_thread_entry(void *parameter)
         speed = period*pulse/100;
 
         rt_mutex_take(number_protect, RT_WAITING_FOREVER);
-        num = number;
+        if(val_flag==1)
+            num = number;
+        else if(val_flag==2)
+        {
+            num = right_val;
+        }
         rt_mutex_release(number_protect);
         dia = 0;
 

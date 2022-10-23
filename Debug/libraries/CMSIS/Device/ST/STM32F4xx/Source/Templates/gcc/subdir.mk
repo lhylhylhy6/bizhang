@@ -15,5 +15,5 @@ S_UPPER_DEPS += \
 
 # Each subdirectory must supply rules for building sources it contributes
 libraries/CMSIS/Device/ST/STM32F4xx/Source/Templates/gcc/%.o: ../libraries/CMSIS/Device/ST/STM32F4xx/Source/Templates/gcc/%.S
-	arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -O0 -ffunction-sections -fdata-sections -Wall  -g -gdwarf-2 -x assembler-with-cpp -I"C:\Users\10091\Desktop\1\bizhang" -I"C:\Users\10091\Desktop\1\bizhang\eMPL" -Xassembler -mimplicit-it=thumb -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)" -c -o "$@" "$<"
+	arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -O0 -ffunction-sections -fdata-sections -Wall  -g -gdwarf-2 -x assembler-with-cpp -I"G:\RT-ThreadStudio1\workspace\bizhang" -I"G:\RT-ThreadStudio1\workspace\bizhang\eMPL" -Xassembler -mimplicit-it=thumb -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)" -c -o "$@" "$<"
 

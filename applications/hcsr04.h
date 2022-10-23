@@ -14,4 +14,6 @@
 #include <rtdevice.h>
 #include <board.h>
 
+rt_err_t HCSR_init(void);
+
 #endif /* APPLICATIONS_HCSR04_H_ */
