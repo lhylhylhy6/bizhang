@@ -1,0 +1,3 @@
+[submodule "mpu6xxx-latest"]
+	path = mpu6xxx-latest
+	url = D:/RT-ThreadStudio/project/bizhang/packages/mpu6xxx-latest/.git
