@@ -1,4 +1,5 @@
 /*
+#include <packages/mpu6xxx-latest/inc/mpu6xxx.h>
  * Copyright (c) 2006-2022, RT-Thread Development Team
  *
  * SPDX-License-Identifier: Apache-2.0
@@ -9,7 +10,6 @@
  */
 
 #include <rtthread.h>
-#include "mpu6xxx.h"
 
 /* Default configuration, please change according to the actual situation, support i2c and spi device name */
 #define MPU6XXX_DEVICE_NAME  "i2c2"

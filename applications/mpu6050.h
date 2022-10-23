@@ -8,10 +8,11 @@
  * 2022-10-22     10091       the first version
  */
 #ifndef APPLICATIONS_MPU6050_H_
+
 #define APPLICATIONS_MPU6050_H_
 
 #include <rtthread.h>
-#include "sensor_inven_mpu6xxx.h"
+#include <packages/mpu6xxx-latest/inc/sensor_inven_mpu6xxx.h>
 #include "inv_mpu.h"
 #include "inv_mpu_dmp_motion_driver.h"
 #include "dmpKey.h"

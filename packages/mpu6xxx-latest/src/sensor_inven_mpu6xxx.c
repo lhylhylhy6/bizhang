@@ -8,7 +8,7 @@
  * 2019-05-08     flybreak     the first version
  */
 
-#include "sensor_inven_mpu6xxx.h"
+#include <packages/mpu6xxx-latest/inc/sensor_inven_mpu6xxx.h>
 
 #define DBG_TAG "sensor.inven.mpu6xxx"
 #define DBG_LVL DBG_INFO

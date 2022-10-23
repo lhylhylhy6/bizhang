@@ -27,6 +27,7 @@ libraries/CMSIS/Device/ST/STM32F4xx/Source/Templates \
 libraries/STM32F4xx_HAL_Driver/Src/Legacy \
 libraries/STM32F4xx_HAL_Driver/Src \
 packages/mpu6xxx-latest/src \
+packages/rt_vsnprintf_full-latest \
 rt-thread/components/drivers/i2c \
 rt-thread/components/drivers/ipc \
 rt-thread/components/drivers/misc \

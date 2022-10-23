@@ -187,6 +187,8 @@ void hcsr_read(int argc,char **argv)
 
     while(times--)
     {
+        int count=0,i=0,S=0;
+        double cmval = 0.0;
         for(i=0;i<5;i++)
         {
             rt_pin_write(trig,PIN_HIGH);
@@ -204,6 +206,9 @@ void hcsr_read(int argc,char **argv)
         }
         cmval=S/100.0;
         LOG_D("%s : S = %f cm\n",str,cmval);
+        S=0;
+        count=0;
+        cmval=0;
     }
 
 }
