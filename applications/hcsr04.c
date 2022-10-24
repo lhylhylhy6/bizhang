@@ -86,7 +86,7 @@ static void hcsr_mid_thread_entry(void *parameter)
         }
         cmval=S/40.0;
         mid_val = cmval;
-        LOG_D("mid : S = %f cm\n",cmval);
+        //LOG_D("mid : S = %f cm\n",cmval);
         if(cmval<=CMP_MID_VAL && turn_flag==0)
         {
             int level;
