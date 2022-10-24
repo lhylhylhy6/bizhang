@@ -24,10 +24,11 @@ extern int middle;
 extern rt_int32_t pwm_l,pwm_r;
 int main(void)
 {
-    pid_uart_init();
+    //pid_uart_init();
     HCSR_init();
     car_init();
     rt_kprintf("init all ok!\r\n");
+
     while (1)
     {
         rt_thread_mdelay(500);

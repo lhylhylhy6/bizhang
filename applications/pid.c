@@ -8,7 +8,7 @@
  * 2022-09-20     10091       the first version
  */
 #include "pid.h"
-
+#include "hc_pid.h"
 #define DBG_TAG "pid"
 #define DBG_LVL DBG_LOG
 #include <rtdbg.h>
@@ -30,60 +30,15 @@ float dia=0;
 
 int val_flag=1;
 
+
 rt_thread_t pid_thread = RT_NULL;
 rt_mutex_t pid_completion;
 
-void pwm_limit(rt_int32_t * pwm1,rt_int32_t * pwm2)
-{
-    if(*pwm1>1000000) *pwm1=1000000;
-    else if(*pwm1<-1000000) *pwm1=-1000000;
 
-    if(*pwm2>1000000) *pwm2=1000000;
-    else if(*pwm2<-1000000) *pwm2=-1000000;
-}
-
-void pwm_abs(rt_int32_t pwm_1,rt_int32_t pwm_2)
-{
-
-    if(pwm_1<0)
-        {
-            rt_pin_write(AIN2_PIN, PIN_HIGH);
-            rt_pin_write(AIN1_PIN, PIN_LOW);
-            pwm_1 = -pwm_1;
-        }
-        else if(pwm_1>=0)
-        {
-            rt_pin_write(AIN1_PIN, PIN_HIGH);
-            rt_pin_write(AIN2_PIN, PIN_LOW);
-        }
-        if(pwm_2<0)
-        {
-            rt_pin_write(BIN2_PIN, PIN_HIGH);
-            rt_pin_write(BIN1_PIN, PIN_LOW);
-            pwm_2 = -pwm_2;
-        }
-        else if(pwm_2>=0)
-        {
-            rt_pin_write(BIN1_PIN, PIN_HIGH);
-            rt_pin_write(BIN2_PIN, PIN_LOW);
-        }
-
-        pwm_limit(&pwm_1, &pwm_2);
-        rt_pwm_set(pwm1, PWM_CHANNEL1, period,(rt_uint32_t) pwm_1);
-        rt_pwm_set(pwm2, PWM_CHANNEL2, period,(rt_uint32_t) pwm_2);
-}
 
 float error=0,ierror=0,derror=0,errorlast=0;
 void pid_compute(int val)
 {
-    if(val_flag==1)
-    {
-        middle=160;
-    }
-    else if(val_flag==2)
-    {
-        middle=7;
-    }
 
     error = middle*1.0 - val;
     ierror=ierror+error;
@@ -95,8 +50,9 @@ void pid_compute(int val)
     pwm_l = speed - dia;
     pwm_r = speed + dia;
     pwm_abs(pwm_l, pwm_r);
-
 }
+
+
 
 int pid_set(int argc,char **argv)
 {
@@ -114,6 +70,8 @@ int pid_set(int argc,char **argv)
 }
 MSH_CMD_EXPORT(pid_set,pid parameter set);
 
+
+
 rt_uint32_t num=0;
 extern float right_val;
 void pid_thread_entry(void *parameter)
@@ -123,18 +81,19 @@ void pid_thread_entry(void *parameter)
     {
         speed = period*pulse/100;
 
-        rt_mutex_take(number_protect, RT_WAITING_FOREVER);
-        if(val_flag==1)
-            num = number;
-        else if(val_flag==2)
-        {
-            num = right_val;
-        }
-        rt_mutex_release(number_protect);
+        //rt_mutex_take(number_protect, RT_WAITING_FOREVER);
+//        if(val_flag==1)
+//            num = number;
+//        else if(val_flag==2)
+//        {
+//            num = right_val;
+//        }
+        num = right_val;
+        //rt_mutex_release(number_protect);
         dia = 0;
 
         rt_mutex_take(pid_completion, RT_WAITING_FOREVER);
-        pid_compute(num);
+        hc_pid_compute(num);
         rt_mutex_release(pid_completion);
         rt_thread_mdelay(10);
     }
