@@ -81,7 +81,7 @@ int hc_pid_compute(int val)
     pwm_l = speed - dia1;
     pwm_r = speed + dia1;
     hc_pwm_abs(pwm_l, pwm_r);
-
+    return 0;
 }
 
 

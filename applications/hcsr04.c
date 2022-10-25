@@ -28,7 +28,7 @@
 
 #define EN_LEFT_HC      0
 #define EN_RIGHT_HC     1
-#define EN_MID_HC       1
+#define EN_MID_HC       0
 
 #define Left_HC_Trig_Pin        GET_PIN(F,3)
 #define Left_HC_Echo_Pin        GET_PIN(F,4)
@@ -74,7 +74,14 @@ static void hcsr_mid_thread_entry(void *parameter)
             rt_pin_write(Mid_HC_Trig_Pin,PIN_HIGH);
             rt_hw_us_delay(10);
             rt_pin_write(Mid_HC_Trig_Pin,PIN_LOW);
-            while(!rt_pin_read(Mid_HC_Echo_Pin));
+            while(!rt_pin_read(Mid_HC_Echo_Pin))
+            {
+                int a;
+                a++;
+                rt_hw_us_delay(50);
+                if(a>200)
+                    goto __exit;
+            }
             while(rt_pin_read(Mid_HC_Echo_Pin))
             {
                 count++;
@@ -98,14 +105,15 @@ static void hcsr_mid_thread_entry(void *parameter)
 //            rt_pwm_set(pwm1, PWM_CHANNEL2, period, 0);
 //            rt_thread_mdelay(20000);
 //            rt_pwm_set(pwm1, PWM_CHANNEL1, period, (period*20)/100);
-              car_stop();
+            car_stop();
             rt_hw_interrupt_enable(level);
             LOG_D("---------turn----------\r\n");
         }
         S=0;
         count=0;
         cmval=0;
-        rt_thread_mdelay(150);
+__exit:
+        rt_thread_mdelay(100);
     }
 }
 
@@ -120,7 +128,14 @@ static void hcsr_left_thread_entry(void *parameter)
             rt_pin_write(Left_HC_Trig_Pin,PIN_HIGH);
             rt_hw_us_delay(10);
             rt_pin_write(Left_HC_Trig_Pin,PIN_LOW);
-            while(!rt_pin_read(Left_HC_Echo_Pin));
+            while(!rt_pin_read(Left_HC_Echo_Pin))
+            {
+                int a;
+                a++;
+                rt_hw_us_delay(50);
+                if(a>200)
+                    goto __exit;
+            }
             while(rt_pin_read(Left_HC_Echo_Pin))
             {
                 count++;
@@ -136,22 +151,34 @@ static void hcsr_left_thread_entry(void *parameter)
         S=0;
         count=0;
         cmval=0;
-        rt_thread_mdelay(150);
+__exit:
+        rt_thread_mdelay(100);
     }
 }
-
+int ffflag=0;
 static void hcsr_right_thread_entry(void *parameter)
 {
     int count = 0 ,S = 0,i=0;
     float cmval=0;
     while(1)
     {
-        for(i=0;i<2;i++)
+        for(i=0;i<1;i++)
         {
             rt_pin_write(Right_HC_Trig_Pin,PIN_HIGH);
             rt_hw_us_delay(10);
             rt_pin_write(Right_HC_Trig_Pin,PIN_LOW);
             while(!rt_pin_read(Right_HC_Echo_Pin));
+            {
+                int a;
+                a++;
+                rt_hw_us_delay(50);
+                if(a>800)
+                {
+                    a=0;
+                    goto __exti;
+                }
+
+            }
             while(rt_pin_read(Right_HC_Echo_Pin))
             {
                 count++;
@@ -159,15 +186,18 @@ static void hcsr_right_thread_entry(void *parameter)
             }
             S = 17*count +S;
             count = 0;
-            rt_thread_mdelay(50);
+            //rt_thread_mdelay(50);
         }
-        cmval=S/40.0;
+        cmval=S/20.0;
         right_val = cmval;
-        //LOG_D("right : S = %f cm\n",cmval);
+        ffflag=1;
+        LOG_D("right : S = %f cm\n",cmval);
         S=0;
         count=0;
         cmval=0;
-        rt_thread_mdelay(150);
+__exti:
+
+        rt_thread_mdelay(10);
     }
 }
 

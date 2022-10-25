@@ -12,6 +12,7 @@
 #include <rtthread.h>
 #include <rtdevice.h>
 #include "drivers\include\drv_common.h"
+#include "hcsr04.h"
 
 #define DBG_TAG "car"
 #define DBG_LVL DBG_LOG
@@ -52,7 +53,7 @@ int car_init(void)
     rt_pin_write(BIN2_PIN, PIN_LOW);
 
     ret = pwm_init();
-    pid_init();
+    //pid_init();
 
     return ret;
 }
@@ -63,8 +64,8 @@ extern rt_uint32_t period;
 
 int car_forward(void)
 {
-    rt_pwm_set(pwm1, PWM_CHANNEL1, period, 300000); //left
-    rt_pwm_set(pwm2, PWM_CHANNEL2, period, 300000); //right
+    rt_pwm_set(pwm1, PWM_CHANNEL1, period, period*pulse/100); //left
+    rt_pwm_set(pwm2, PWM_CHANNEL2, period, period*pulse/100); //right
     rt_pin_write(AIN1_PIN, PIN_HIGH);
     rt_pin_write(AIN2_PIN, PIN_LOW);
     rt_pin_write(BIN1_PIN, PIN_HIGH);
@@ -82,6 +83,65 @@ int car_stop(void)
     my_pwm_disable();
     rt_kprintf("now car is stop\r\n");
     return RT_EOK;
+}
+
+int car_left(void)
+{
+   rt_err_t ret = RT_EOK;
+   rt_pwm_set(pwm1,PWM_CHANNEL1,period, period * 15/100);
+   rt_pwm_set(pwm2,PWM_CHANNEL2,period, period * pulse/100);
+   rt_thread_mdelay(100);
+//   rt_pwm_set(pwm1,PWM_CHANNEL1,period, period * pulse/ 100);
+//   rt_pwm_set(pwm2,PWM_CHANNEL2,period, period * pulse/ 100);
+   return ret;
+}
+
+int car_right(void)
+{
+   rt_err_t ret = RT_EOK;
+   rt_pwm_set(pwm1,PWM_CHANNEL1,period, period * pulse/100);
+   rt_pwm_set(pwm2,PWM_CHANNEL2,period, period * 15/100);
+   rt_thread_mdelay(100);
+//   rt_pwm_set(pwm1,PWM_CHANNEL1,period, period * pulse/100);
+//   rt_pwm_set(pwm2,PWM_CHANNEL2,period, period * pulse/ 100);
+   return ret;
+}
+extern float right_val;
+extern int ffflag;
+void car_cc_entery(void *parameter)
+{
+    while(1)
+    {
+        rt_kprintf("%d\n",ffflag);
+        if(ffflag==0)
+        {
+            car_forward();
+        }
+        if(right_val>7&&ffflag==1)
+        {
+            ffflag=0;
+            car_right();
+        }
+        else if(right_val<7&&ffflag==1)
+        {
+            ffflag=0;
+            car_left();
+        }
+        rt_thread_mdelay(100);
+    }
+}
+
+rt_thread_t cc_thread;
+void car_cc_init(void)
+{
+    cc_thread = rt_thread_create("cc", car_cc_entery, RT_NULL, 1024, 8, 400);
+    if(cc_thread)
+    {
+        rt_thread_startup(cc_thread);
+    }
+    else {
+        LOG_D("start up cc error\n");
+    }
 }
 
 

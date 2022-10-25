@@ -49,7 +49,7 @@ void pid_compute(int val)
     dia = kp*error/100.0+ki*ierror+kd*derror/10.0;
     pwm_l = speed - dia;
     pwm_r = speed + dia;
-    pwm_abs(pwm_l, pwm_r);
+    hc_pwm_abs(pwm_l, pwm_r);
 }
 
 
