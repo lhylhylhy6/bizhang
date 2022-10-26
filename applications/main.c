@@ -27,14 +27,13 @@ int main(void)
     //pid_uart_init();
     HCSR_init();
     car_init();
-    car_cc_init();
+    //car_cc_init();
     car_forward();
     rt_kprintf("init all ok!\r\n");
-
     while (1)
     {
-        rt_thread_mdelay(500);
-
+        car_left();
+        rt_thread_mdelay(50);
     }
 
     return RT_EOK;
