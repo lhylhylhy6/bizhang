@@ -10,7 +10,7 @@
 #include "hc_pid.h"
 
 int middle1 = 10;
-float kp1 = 500;
+float kp1 = -10000;
 float ki1 = 0;
 float kd1 = 0;
 float dia1=0;
@@ -79,7 +79,7 @@ int hc_pid_compute(int val)
     else if(ierror1<-3000) ierror1=-3000;
     dia1 = kp1*error1+ki1*ierror1+kd1*derror1;
     pwm_l = speed - dia1;
-    pwm_r = speed + dia1;
+    pwm_r = speed + 5*dia1;
     hc_pwm_abs(pwm_l, pwm_r);
     return 0;
 }

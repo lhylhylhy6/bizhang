@@ -15,7 +15,6 @@
 
 extern rt_uint32_t number;
 extern rt_uint32_t period,pulse;
-extern rt_mutex_t number_protect;
 
 extern struct rt_device_pwm * pwm1 ;
 extern struct rt_device_pwm * pwm2 ;
@@ -32,8 +31,45 @@ int val_flag=1;
 
 
 rt_thread_t pid_thread = RT_NULL;
-rt_mutex_t pid_completion;
 
+void pwm_limit(rt_int32_t * pwm1,rt_int32_t * pwm2)
+{
+    if(*pwm1>1000000) *pwm1=1000000;
+    else if(*pwm1<-1000000) *pwm1=-1000000;
+
+    if(*pwm2>1000000) *pwm2=1000000;
+    else if(*pwm2<-1000000) *pwm2=-1000000;
+}
+
+void pwm_abs(rt_int32_t pwm_1,rt_int32_t pwm_2)
+{
+
+    if(pwm_1<0)
+        {
+            rt_pin_write(AIN2_PIN, PIN_HIGH);
+            rt_pin_write(AIN1_PIN, PIN_LOW);
+            pwm_1 = -pwm_1;
+        }
+        else if(pwm_1>=0)
+        {
+            rt_pin_write(AIN1_PIN, PIN_HIGH);
+            rt_pin_write(AIN2_PIN, PIN_LOW);
+        }
+        if(pwm_2<0)
+        {
+            rt_pin_write(BIN2_PIN, PIN_HIGH);
+            rt_pin_write(BIN1_PIN, PIN_LOW);
+            pwm_2 = -pwm_2;
+        }
+        else if(pwm_2>=0)
+        {
+            rt_pin_write(BIN1_PIN, PIN_HIGH);
+            rt_pin_write(BIN2_PIN, PIN_LOW);
+        }
+        pwm_limit(&pwm_1, &pwm_2);
+        rt_pwm_set(pwm1, PWM_CHANNEL1, period,(rt_uint32_t) pwm_1);
+        rt_pwm_set(pwm2, PWM_CHANNEL2, period,(rt_uint32_t) pwm_2);
+}
 
 
 float error=0,ierror=0,derror=0,errorlast=0;
@@ -49,7 +85,7 @@ void pid_compute(int val)
     dia = kp*error/100.0+ki*ierror+kd*derror/10.0;
     pwm_l = speed - dia;
     pwm_r = speed + dia;
-    hc_pwm_abs(pwm_l, pwm_r);
+    pwm_abs(pwm_l, pwm_r);
 }
 
 
@@ -73,36 +109,23 @@ MSH_CMD_EXPORT(pid_set,pid parameter set);
 
 
 rt_uint32_t num=0;
-extern float right_val;
+extern float right_val,left_val;
 void pid_thread_entry(void *parameter)
 {
-
     while(1)
     {
         speed = period*pulse/100;
-
-        //rt_mutex_take(number_protect, RT_WAITING_FOREVER);
-//        if(val_flag==1)
-//            num = number;
-//        else if(val_flag==2)
-//        {
-//            num = right_val;
-//        }
-        num = right_val;
-        //rt_mutex_release(number_protect);
+        num = left_val;
         dia = 0;
-
-        rt_mutex_take(pid_completion, RT_WAITING_FOREVER);
-        hc_pid_compute(num);
-        rt_mutex_release(pid_completion);
+        if(num>3&&num<150);
+            hc_pid_compute(num);
         rt_thread_mdelay(10);
     }
 }
 
 int pid_init(void)
 {
-    pid_completion = rt_mutex_create("pid_compl", RT_IPC_FLAG_PRIO);
-    pid_thread = rt_thread_create("pid_thread", pid_thread_entry, RT_NULL, 1024, 9, 300);
+    pid_thread = rt_thread_create("pid_thread", pid_thread_entry, RT_NULL, 1024, 13, 300);
     if(pid_thread)
     {
         rt_thread_startup(pid_thread);

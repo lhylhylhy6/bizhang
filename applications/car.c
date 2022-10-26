@@ -53,7 +53,7 @@ int car_init(void)
     rt_pin_write(BIN2_PIN, PIN_LOW);
 
     ret = pwm_init();
-    //pid_init();
+    pid_init();
 
     return ret;
 }
@@ -87,14 +87,11 @@ int car_stop(void)
 
 int car_left(void)
 {
-   rt_err_t ret = RT_EOK;
-   rt_pwm_set(pwm1,PWM_CHANNEL1,period, period * 15/100);
-   rt_pwm_set(pwm2,PWM_CHANNEL2,period, period * pulse/100);
-   rt_thread_mdelay(100);
-//   rt_pwm_set(pwm1,PWM_CHANNEL1,period, period * pulse/ 100);
-//   rt_pwm_set(pwm2,PWM_CHANNEL2,period, period * pulse/ 100);
-   return ret;
+    rt_pwm_set(pwm1, PWM_CHANNEL1, period, period*25/100); //left
+    rt_pwm_set(pwm2, PWM_CHANNEL2, period, period*50/100); //right
 }
+
+
 
 int car_right(void)
 {
