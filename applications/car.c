@@ -84,13 +84,23 @@ int car_stop(void)
     rt_kprintf("now car is stop\r\n");
     return RT_EOK;
 }
-
+int a=25,b=50;
+int car_set(int argc,char **argv)
+{
+    if(argc==3)
+    {
+        a=atoi(argv[1]);
+        b=atoi(argv[2]);
+    }
+    return 0;
+}
+MSH_CMD_EXPORT(car_set,car_set);
 int car_left(void)
 {
    rt_err_t ret = RT_EOK;
-   rt_pwm_set(pwm1,PWM_CHANNEL1,period, period * 15/100);
-   rt_pwm_set(pwm2,PWM_CHANNEL2,period, period * pulse/100);
-   rt_thread_mdelay(100);
+   rt_pwm_set(pwm1,PWM_CHANNEL1,period, period * a/100);
+   rt_pwm_set(pwm2,PWM_CHANNEL2,period, period * b/100);
+//   rt_thread_mdelay(100);
 //   rt_pwm_set(pwm1,PWM_CHANNEL1,period, period * pulse/ 100);
 //   rt_pwm_set(pwm2,PWM_CHANNEL2,period, period * pulse/ 100);
    return ret;

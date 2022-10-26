@@ -27,8 +27,9 @@ int main(void)
     //pid_uart_init();
     HCSR_init();
     car_init();
-    car_cc_init();
+    //car_cc_init();
     car_forward();
+    car_left();
     rt_kprintf("init all ok!\r\n");
 
     while (1)

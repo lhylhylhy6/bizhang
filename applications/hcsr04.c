@@ -24,11 +24,11 @@
 #define DBG_LVL DBG_LOG
 #include <rtdbg.h>
 
-#define CMP_MID_VAL     15
+#define CMP_MID_VAL     30
 
-#define EN_LEFT_HC      0
+#define EN_LEFT_HC      1
 #define EN_RIGHT_HC     1
-#define EN_MID_HC       0
+#define EN_MID_HC       1
 
 #define Left_HC_Trig_Pin        GET_PIN(F,3)
 #define Left_HC_Echo_Pin        GET_PIN(F,4)
@@ -69,7 +69,7 @@ static void hcsr_mid_thread_entry(void *parameter)
     float cmval=0;
     while(1)
     {
-        for(i=0;i<2;i++)
+        for(i=0;i<1;i++)
         {
             rt_pin_write(Mid_HC_Trig_Pin,PIN_HIGH);
             rt_hw_us_delay(10);
@@ -89,25 +89,16 @@ static void hcsr_mid_thread_entry(void *parameter)
             }
             S = 17*count +S;
             count = 0;
-            rt_thread_mdelay(50);
+            //rt_thread_mdelay(20);
         }
-        cmval=S/40.0;
+        cmval=S/20.0;
         mid_val = cmval;
         //LOG_D("mid : S = %f cm\n",cmval);
         if(cmval<=CMP_MID_VAL && turn_flag==0)
         {
-            int level;
-            level = rt_hw_interrupt_disable();
             turn_flag=1;
-            val_flag=2;
+            car_left();
 
-//            rt_pwm_set(pwm1, PWM_CHANNEL1, period, period);
-//            rt_pwm_set(pwm1, PWM_CHANNEL2, period, 0);
-//            rt_thread_mdelay(20000);
-//            rt_pwm_set(pwm1, PWM_CHANNEL1, period, (period*20)/100);
-            car_stop();
-            rt_hw_interrupt_enable(level);
-            LOG_D("---------turn----------\r\n");
         }
         S=0;
         count=0;
