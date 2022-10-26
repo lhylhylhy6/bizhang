@@ -26,8 +26,6 @@
 
 #define CMP_MID_VAL     30
 
-#define EN_LEFT_HC      1
-#define EN_RIGHT_HC     1
 #define EN_MID_HC       1
 
 #define Left_HC_Trig_Pin        GET_PIN(F,3)
@@ -99,6 +97,7 @@ static void hcsr_mid_thread_entry(void *parameter)
             turn_flag=1;
             car_left();
 
+
         }
         S=0;
         count=0;
@@ -111,6 +110,7 @@ __exit:
 static void hcsr_left_thread_entry(void *parameter)
 {
     int count = 0 ,S = 0,i=0;
+
     float cmval=0;
     while(1)
     {
@@ -121,10 +121,11 @@ static void hcsr_left_thread_entry(void *parameter)
             rt_pin_write(Left_HC_Trig_Pin,PIN_LOW);
             while(!rt_pin_read(Left_HC_Echo_Pin))
             {
-                int a;
+                int a=0;
                 a++;
                 rt_hw_us_delay(50);
-                if(a>200)
+
+                if(a>500)
                     goto __exit;
             }
             while(rt_pin_read(Left_HC_Echo_Pin))
@@ -134,15 +135,18 @@ static void hcsr_left_thread_entry(void *parameter)
             }
             S = 17*count +S;
             count = 0;
-            rt_thread_mdelay(50);
+
+
+            rt_thread_mdelay(20);
         }
         cmval=S/40.0;
         left_val = cmval;
-        //LOG_D("left : S = %f cm\n",cmval);
+
+        LOG_D("left : S = %f cm\n",cmval);
+__exit:
         S=0;
         count=0;
         cmval=0;
-__exit:
         rt_thread_mdelay(100);
     }
 }
@@ -198,7 +202,7 @@ rt_err_t HCSR_init(void)
 
 #if EN_LEFT_HC
     rt_thread_t left_hc_thread;
-    left_hc_thread = rt_thread_create("left_hc", hcsr_left_thread_entry, RT_NULL, 1024, 7, 200);
+    left_hc_thread = rt_thread_create("left_hc", hcsr_left_thread_entry, RT_NULL, 1024, 10, 200);
     if(left_hc_thread)
     {
         ree = rt_thread_startup(left_hc_thread);
