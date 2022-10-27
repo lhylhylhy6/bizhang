@@ -9,8 +9,10 @@
  */
 #include "hc_pid.h"
 
-int middle1 = 10;
-float kp1 = -10000;
+#define LIMIT_VAL 700000
+
+int middle1 = 15;
+float kp1 = -7000;
 float ki1 = 0;
 float kd1 = 0;
 float dia1=0;
@@ -20,20 +22,22 @@ extern struct rt_device_pwm * pwm1 ;
 extern struct rt_device_pwm * pwm2 ;
 
 extern rt_int32_t pwm_l,pwm_r;
-extern rt_int32_t speed;
+extern rt_int32_t speed1;
+extern rt_int32_t speed2;
 
 void hc_pwm_limit(rt_int32_t * pwm1,rt_int32_t * pwm2)
 {
-    if(*pwm1>1000000) *pwm1=1000000;
-    else if(*pwm1<-1000000) *pwm1=-1000000;
+    if(*pwm1>LIMIT_VAL) *pwm1=LIMIT_VAL;
+    else if(*pwm1<-LIMIT_VAL) *pwm1=-LIMIT_VAL;
 
-    if(*pwm2>1000000) *pwm2=1000000;
-    else if(*pwm2<-1000000) *pwm2=-1000000;
+    if(*pwm2>LIMIT_VAL) *pwm2=LIMIT_VAL;
+    else if(*pwm2<-LIMIT_VAL) *pwm2=-LIMIT_VAL;
 }
 
 void hc_pwm_abs(rt_int32_t pwm_1,rt_int32_t pwm_2)
 {
-
+    speed1 = period*25/100;
+    speed2 = period*40/100;
     if(pwm_1<0)
     {
         pwm_1 = 0;
@@ -54,23 +58,23 @@ void hc_pwm_abs(rt_int32_t pwm_1,rt_int32_t pwm_2)
     }
 
     hc_pwm_limit(&pwm_1, &pwm_2);
+
     static int i=0;
     i++;
-    if(i==100)
+    if(i==1)
     {
         i = 0;
         rt_kprintf("%d %d\n",pwm_1,pwm_2);
     }
 
-    rt_pwm_set(pwm1, PWM_CHANNEL1, period,(rt_uint32_t) pwm_1);
+    rt_pwm_set(pwm1, PWM_CHANNEL1, period,period*25/100);
     rt_pwm_set(pwm2, PWM_CHANNEL2, period,(rt_uint32_t) pwm_2);
 }
 
 float error1=0,ierror1=0,derror1=0,errorlast1=0;
 int hc_pid_compute(int val)
 {
-    if(val>100)
-        return 0;
+
     error1 = middle1*1.0 - val;
     ierror1=ierror1+error1;
     derror1=error1-errorlast1;
@@ -78,8 +82,8 @@ int hc_pid_compute(int val)
     if(ierror1>3000) ierror1=3000;
     else if(ierror1<-3000) ierror1=-3000;
     dia1 = kp1*error1+ki1*ierror1+kd1*derror1;
-    pwm_l = speed - dia1;
-    pwm_r = speed + 5*dia1;
+    pwm_l = speed1 - dia1;
+    pwm_r = speed2 + dia1;
     hc_pwm_abs(pwm_l, pwm_r);
     return 0;
 }

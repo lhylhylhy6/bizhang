@@ -9,6 +9,8 @@
  */
 #include "pid.h"
 #include "hc_pid.h"
+#include "car.h"
+
 #define DBG_TAG "pid"
 #define DBG_LVL DBG_LOG
 #include <rtdbg.h>
@@ -20,7 +22,10 @@ extern struct rt_device_pwm * pwm1 ;
 extern struct rt_device_pwm * pwm2 ;
 
 rt_int32_t pwm_l,pwm_r;
-rt_int32_t speed;
+rt_int32_t speed1;
+rt_int32_t speed2;
+
+
 int middle = 162;
 float kp = 180089;
 float ki = -2.33;
@@ -75,7 +80,8 @@ void pwm_abs(rt_int32_t pwm_1,rt_int32_t pwm_2)
 float error=0,ierror=0,derror=0,errorlast=0;
 void pid_compute(int val)
 {
-
+    speed1 = period*25/100;
+    speed2 = period*40/100;
     error = middle*1.0 - val;
     ierror=ierror+error;
     derror=error-errorlast;
@@ -83,8 +89,8 @@ void pid_compute(int val)
     if(ierror>3000) ierror=3000;
     else if(ierror<-3000) ierror=-3000;
     dia = kp*error/100.0+ki*ierror+kd*derror/10.0;
-    pwm_l = speed - dia;
-    pwm_r = speed + dia;
+    pwm_l = speed1 - dia;
+    pwm_r = speed2 + dia;
     pwm_abs(pwm_l, pwm_r);
 }
 
@@ -114,12 +120,18 @@ void pid_thread_entry(void *parameter)
 {
     while(1)
     {
-        speed = period*pulse/100;
+//        speed = period*pulse/100;
         num = left_val;
         dia = 0;
-        if(num>3&&num<150);
+        if(num<10)
             hc_pid_compute(num);
-        rt_thread_mdelay(10);
+
+        else if(num>200)
+        {
+            car_forward();
+        }
+
+        rt_thread_mdelay(50);
     }
 }
 

@@ -11,7 +11,7 @@
 #define APPLICATIONS_CAR_H_
 
 #include "car_pwm.h"
-
+#include <board.h>
 #define AIN1_PIN GET_PIN(F, 6)
 #define AIN2_PIN GET_PIN(F, 7)
 #define BIN1_PIN GET_PIN(F, 8)

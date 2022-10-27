@@ -13,6 +13,7 @@
 rt_sem_t rx_sem;
 rt_device_t pid_uart = RT_NULL;
 rt_uint32_t number = 0;
+rt_uint32_t straight_number = 0;
 rt_thread_t pid_read_thread;
 
 
@@ -40,7 +41,7 @@ void pid_read_entry(void *parameter)
          }
          else if(ch==']')
          {
-             number = temp_number;
+             straight_number = temp_number;
              temp_number = 0 ;
          }
          else if(ch=='c')
