@@ -8,7 +8,7 @@
  * 2022-09-20     lhylh       the first version
  */
 #include "car.h"
-#include "pid.h"
+#include "hc_pid.h"
 #include <rtthread.h>
 #include <rtdevice.h>
 #include "drivers\include\drv_common.h"

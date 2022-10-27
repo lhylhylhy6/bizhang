@@ -11,6 +11,10 @@
 
 #define LIMIT_VAL 700000
 
+rt_thread_t hc_pid = RT_NULL;
+rt_int32_t speed1;
+rt_int32_t speed2;
+
 int middle1 = 15;
 float kp1 = -7000;
 float ki1 = 0;
@@ -20,10 +24,8 @@ float dia1=0;
 extern rt_uint32_t period,pulse;
 extern struct rt_device_pwm * pwm1 ;
 extern struct rt_device_pwm * pwm2 ;
-
 extern rt_int32_t pwm_l,pwm_r;
-extern rt_int32_t speed1;
-extern rt_int32_t speed2;
+
 
 void hc_pwm_limit(rt_int32_t * pwm1,rt_int32_t * pwm2)
 {
@@ -74,7 +76,6 @@ void hc_pwm_abs(rt_int32_t pwm_1,rt_int32_t pwm_2)
 float error1=0,ierror1=0,derror1=0,errorlast1=0;
 int hc_pid_compute(int val)
 {
-
     error1 = middle1*1.0 - val;
     ierror1=ierror1+error1;
     derror1=error1-errorlast1;
@@ -104,3 +105,36 @@ int hc_pid_set(int argc,char **argv)
     return RT_EOK;
 }
 MSH_CMD_EXPORT(hc_pid_set,pid parameter set);
+
+rt_uint32_t num=0;
+extern float right_val,left_val;
+void hc_pid_thread_entry(void *parameter)
+{
+    while(1)
+    {
+        num = left_val;
+        dia1 = 0;
+        if(num<17)
+            hc_pid_compute(num);
+        else if(num>200)
+        {
+            car_forward();
+        }
+
+        rt_thread_mdelay(50);
+    }
+}
+
+int hc_pid_init(void)
+{
+    hc_pid = rt_thread_create("hc_pid_thread", hc_pid_thread_entry, RT_NULL, 1024, 7, 300);
+    if(hc_pid)
+    {
+        rt_thread_startup(hc_pid);
+    }
+    else {
+        rt_kprintf("create pid_thread error\r\n");
+        return -RT_ERROR;
+    }
+    return RT_EOK;
+}
