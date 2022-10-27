@@ -198,7 +198,7 @@ rt_err_t HCSR_init(void)
 
 #if EN_LEFT_HC
     rt_thread_t left_hc_thread;
-    left_hc_thread = rt_thread_create("left_hc", hcsr_left_thread_entry, RT_NULL, 1024, 10, 150);
+    left_hc_thread = rt_thread_create("left_hc", hcsr_left_thread_entry, RT_NULL, 1024, 5, 150);
     if(left_hc_thread)
     {
         ree = rt_thread_startup(left_hc_thread);

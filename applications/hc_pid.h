@@ -21,6 +21,6 @@ void hc_pwm_limit(rt_int32_t * pwm1,rt_int32_t * pwm2);
 void hc_pwm_abs(rt_int32_t pwm_1,rt_int32_t pwm_2);
 int hc_pid_compute(int val);
 int hc_pid_set(int argc,char **argv);
-
+int hc_pid_init(void);
 
 #endif /* APPLICATIONS_HC_PID_H_ */

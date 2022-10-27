@@ -12,11 +12,10 @@
 #include "uart2.h"
 #include "car.h"
 #include "hcsr04.h"
-
+#include "hc_pid.h"
 #define DBG_TAG "main"
 #define DBG_LVL DBG_LOG
 #include <rtdbg.h>
-#include <pid.h>
 #include "car_pwm.h"
 
 extern rt_uint32_t number;
@@ -25,11 +24,9 @@ extern rt_int32_t pwm_l,pwm_r;
 int main(void)
 {
     //pid_uart_init();
-    pid_init();
-    HCSR_init();
-
     car_init();
-
+    HCSR_init();
+    hc_pid_init();
     car_forward();
     car_left();
     rt_kprintf("init all ok!\r\n");

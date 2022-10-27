@@ -109,7 +109,6 @@ MSH_CMD_EXPORT(straight_pid_set,pid parameter set);
 
 
 rt_uint32_t staraight_num=0;
-extern float right_val,left_val;
 void straight_pid_thread_entry(void *parameter)
 {
     while(1)
@@ -124,7 +123,7 @@ void straight_pid_thread_entry(void *parameter)
 
 int straight_pid_init(void)
 {
-    straight_pid_thread = rt_thread_create("pid_thread", straight_pid_thread_entry, RT_NULL, 1024, 13, 300);
+    straight_pid_thread = rt_thread_create("straight_pid_thread", straight_pid_thread_entry, RT_NULL, 1024, 7, 300);
     if(straight_pid_thread)
     {
         rt_thread_startup(straight_pid_thread);
