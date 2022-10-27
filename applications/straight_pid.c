@@ -22,13 +22,13 @@ extern struct rt_device_pwm * pwm1 ;
 extern struct rt_device_pwm * pwm2 ;
 
 rt_int32_t pwm_l,pwm_r;
-extern rt_int32_t speed;
+rt_int32_t speed;
 
 
-int straight_middle = 162;
-float straight_kp = 180089;
-float straight_ki = -2.33;
-float straight_kd = 81;
+int straight_middle = 165;
+float straight_kp = 48000;
+float straight_ki = 0;
+float straight_kd =0;
 float straight_dia=0;
 
 rt_thread_t straight_pid_thread = RT_NULL;
@@ -117,6 +117,7 @@ void straight_pid_thread_entry(void *parameter)
         staraight_num = straight_number;
         straight_dia = 0;
         straight_pid_compute(staraight_num);
+        //LOG_D("PID OK\n");
         rt_thread_mdelay(50);
     }
 }
