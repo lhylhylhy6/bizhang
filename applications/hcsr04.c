@@ -24,7 +24,7 @@
 #define DBG_LVL DBG_LOG
 #include <rtdbg.h>
 
-#define CMP_MID_VAL     30
+#define CMP_MID_VAL     20
 
 #define EN_MID_HC       1
 #define EN_LEFT_HC      1
@@ -91,14 +91,11 @@ static void hcsr_mid_thread_entry(void *parameter)
             rt_thread_mdelay(20);
         }
         mid_val = S/40.0;
-        LOG_D("mid : S = %f cm\n",mid_val);
-//        if(cmval<=CMP_MID_VAL && turn_flag==0)
-//        {
-//            turn_flag=1;
-//            car_left();
-//
-//
-//        }
+        //LOG_D("mid : S = %f cm\n",mid_val);
+        if(mid_val<=CMP_MID_VAL)
+        {
+            car_stop();
+        }
 __exit:
         S=0;
         count=0;
@@ -136,7 +133,7 @@ static void hcsr_left_thread_entry(void *parameter)
             rt_thread_mdelay(20);
         }
         left_val = S/40.0;
-        LOG_D("left : S = %f cm\n",left_val);
+        //LOG_D("left : S = %f cm\n",left_val);
 __exit:
         S=0;
         count=0;
@@ -175,7 +172,7 @@ static void hcsr_right_thread_entry(void *parameter)
             rt_thread_mdelay(50);
         }
         right_val=S/40.0;
-        LOG_D("right : S = %f cm\n",right_val);
+        //LOG_D("right : S = %f cm\n",right_val);
 __exti:
         S=0;
         count=0;
@@ -183,11 +180,9 @@ __exti:
     }
 }
 
-rt_err_t HCSR_init(void)
+rt_err_t HCSR_left_init(void)
 {
-    rt_err_t ree=RT_EOK;
-
-#if EN_LEFT_HC
+    rt_err_t ree = RT_EOK;
     rt_thread_t left_hc_thread;
     left_hc_thread = rt_thread_create("left_hc", hcsr_left_thread_entry, RT_NULL, 1024, 15, 150);
     if(left_hc_thread)
@@ -195,17 +190,15 @@ rt_err_t HCSR_init(void)
         ree = rt_thread_startup(left_hc_thread);
         LOG_D("left_hc_thread start ok!\r\n");
     }
-#endif
-#if EN_RIGHT_HC
-    rt_thread_t right_hc_thread;
-    right_hc_thread = rt_thread_create("right_hc", hcsr_right_thread_entry, RT_NULL, 1024,15, 200);
-    if(right_hc_thread)
-    {
-        ree = rt_thread_startup(right_hc_thread);
-        LOG_D("right_hc_thread start ok!\r\n");
-    }
-#endif
-#if EN_MID_HC
+    return ree;
+}
+
+rt_err_t HCSR_mid_init(void)
+{
+    rt_err_t ree=RT_EOK;
+
+
+
     rt_thread_t mid_hc_thread;
     mid_hc_thread = rt_thread_create("mid_hc", hcsr_mid_thread_entry, RT_NULL, 1024, 15, 200);
     if(mid_hc_thread)
@@ -213,10 +206,23 @@ rt_err_t HCSR_init(void)
         ree = rt_thread_startup(mid_hc_thread);
         LOG_D("mid_hc_thread start ok!\r\n");
     }
-#endif
+
     return ree;
 }
-MSH_CMD_EXPORT(HCSR_init,HCSR_init);
+
+rt_err_t HCSR_right_init(void)
+{
+    rt_err_t ree = RT_EOK;
+    rt_thread_t right_hc_thread;
+    right_hc_thread = rt_thread_create("right_hc", hcsr_right_thread_entry, RT_NULL, 1024,15, 200);
+    if(right_hc_thread)
+    {
+        ree = rt_thread_startup(right_hc_thread);
+        LOG_D("right_hc_thread start ok!\r\n");
+    }
+    return ree;
+}
+
 void hcsr_read(int argc,char **argv)
 {
     int switch_num=0;
