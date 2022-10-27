@@ -26,9 +26,9 @@
 
 #define CMP_MID_VAL     30
 
-#define EN_MID_HC       0
+#define EN_MID_HC       1
 #define EN_LEFT_HC      1
-#define EN_RIGHT_HC     0
+#define EN_RIGHT_HC     1
 
 #define Left_HC_Trig_Pin        GET_PIN(F,3)
 #define Left_HC_Echo_Pin        GET_PIN(F,4)
@@ -66,17 +66,16 @@ INIT_APP_EXPORT(HCSR_pin_init);
 static void hcsr_mid_thread_entry(void *parameter)
 {
     int count = 0 ,S = 0,i=0;
-    float cmval=0;
     while(1)
     {
-        for(i=0;i<1;i++)
+        for(i=0;i<2;i++)
         {
             rt_pin_write(Mid_HC_Trig_Pin,PIN_HIGH);
             rt_hw_us_delay(10);
             rt_pin_write(Mid_HC_Trig_Pin,PIN_LOW);
             while(!rt_pin_read(Mid_HC_Echo_Pin))
             {
-                int a;
+                int a=0;
                 a++;
                 rt_hw_us_delay(50);
                 if(a>200)
@@ -89,23 +88,21 @@ static void hcsr_mid_thread_entry(void *parameter)
             }
             S = 17*count +S;
             count = 0;
-            //rt_thread_mdelay(20);
+            rt_thread_mdelay(20);
         }
-        cmval=S/20.0;
-        mid_val = cmval;
-        //LOG_D("mid : S = %f cm\n",cmval);
-        if(cmval<=CMP_MID_VAL && turn_flag==0)
-        {
-            turn_flag=1;
-            car_left();
-
-
-        }
+        mid_val = S/40.0;
+        LOG_D("mid : S = %f cm\n",mid_val);
+//        if(cmval<=CMP_MID_VAL && turn_flag==0)
+//        {
+//            turn_flag=1;
+//            car_left();
+//
+//
+//        }
+__exit:
         S=0;
         count=0;
-        cmval=0;
-__exit:
-        rt_thread_mdelay(100);
+        rt_thread_mdelay(50);
     }
 }
 
@@ -139,33 +136,31 @@ static void hcsr_left_thread_entry(void *parameter)
             rt_thread_mdelay(20);
         }
         left_val = S/40.0;
-        //LOG_D("left : S = %f cm\n",left_val);
+        LOG_D("left : S = %f cm\n",left_val);
 __exit:
         S=0;
         count=0;
         rt_thread_mdelay(50);
     }
 }
-int ffflag=0;
+
 static void hcsr_right_thread_entry(void *parameter)
 {
     int count = 0 ,S = 0,i=0;
-    float cmval=0;
     while(1)
     {
-        for(i=0;i<1;i++)
+        for(i=0;i<2;i++)
         {
             rt_pin_write(Right_HC_Trig_Pin,PIN_HIGH);
             rt_hw_us_delay(10);
             rt_pin_write(Right_HC_Trig_Pin,PIN_LOW);
             while(!rt_pin_read(Right_HC_Echo_Pin));
             {
-                int a;
+                int a=0;
                 a++;
                 rt_hw_us_delay(50);
-                if(a>800)
+                if(a>200)
                 {
-                    a=0;
                     goto __exti;
                 }
 
@@ -177,18 +172,14 @@ static void hcsr_right_thread_entry(void *parameter)
             }
             S = 17*count +S;
             count = 0;
-            //rt_thread_mdelay(50);
+            rt_thread_mdelay(50);
         }
-        cmval=S/20.0;
-        right_val = cmval;
-        ffflag=1;
-        LOG_D("right : S = %f cm\n",cmval);
+        right_val=S/40.0;
+        LOG_D("right : S = %f cm\n",right_val);
+__exti:
         S=0;
         count=0;
-        cmval=0;
-__exti:
-
-        rt_thread_mdelay(10);
+        rt_thread_mdelay(50);
     }
 }
 
@@ -198,7 +189,7 @@ rt_err_t HCSR_init(void)
 
 #if EN_LEFT_HC
     rt_thread_t left_hc_thread;
-    left_hc_thread = rt_thread_create("left_hc", hcsr_left_thread_entry, RT_NULL, 1024, 5, 150);
+    left_hc_thread = rt_thread_create("left_hc", hcsr_left_thread_entry, RT_NULL, 1024, 15, 150);
     if(left_hc_thread)
     {
         ree = rt_thread_startup(left_hc_thread);
@@ -207,7 +198,7 @@ rt_err_t HCSR_init(void)
 #endif
 #if EN_RIGHT_HC
     rt_thread_t right_hc_thread;
-    right_hc_thread = rt_thread_create("right_hc", hcsr_right_thread_entry, RT_NULL, 1024,7, 200);
+    right_hc_thread = rt_thread_create("right_hc", hcsr_right_thread_entry, RT_NULL, 1024,15, 200);
     if(right_hc_thread)
     {
         ree = rt_thread_startup(right_hc_thread);
@@ -216,7 +207,7 @@ rt_err_t HCSR_init(void)
 #endif
 #if EN_MID_HC
     rt_thread_t mid_hc_thread;
-    mid_hc_thread = rt_thread_create("mid_hc", hcsr_mid_thread_entry, RT_NULL, 1024, 7, 200);
+    mid_hc_thread = rt_thread_create("mid_hc", hcsr_mid_thread_entry, RT_NULL, 1024, 15, 200);
     if(mid_hc_thread)
     {
         ree = rt_thread_startup(mid_hc_thread);
