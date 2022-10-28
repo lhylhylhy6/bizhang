@@ -26,9 +26,6 @@
 
 #define CMP_MID_VAL    20
 
-#define EN_MID_HC       1
-#define EN_LEFT_HC      1
-#define EN_RIGHT_HC     1
 
 #define Left_HC_Trig_Pin        GET_PIN(F,3)
 #define Left_HC_Echo_Pin        GET_PIN(F,4)
@@ -49,10 +46,12 @@ extern struct rt_device_pwm * pwm1;
 extern struct rt_device_pwm * pwm2;
 extern rt_uint32_t period;
 extern int val_flag;
+
 float mid_val;
 float left_val;
 float right_val;
 
+int turn_flag = 0;
 
 int HCSR_pin_init(void)
 {
@@ -69,7 +68,6 @@ int HCSR_pin_init(void)
 INIT_APP_EXPORT(HCSR_pin_init);
 
 
-int turn_flag = 0;
 static void hcsr_mid_thread_entry(void *parameter)
 {
     int count = 0 ,S = 0,i=0;

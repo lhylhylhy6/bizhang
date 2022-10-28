@@ -87,35 +87,20 @@ int car_stop(void)
 
 int car_left(void)
 {
-    my_pwm_enable();
+    rt_pwm_set(pwm1, PWM_CHANNEL1, period, period*25/100); //left
+    rt_pwm_set(pwm2, PWM_CHANNEL2, period, period*40/100); //right
     rt_pin_write(AIN1_PIN, PIN_HIGH);
     rt_pin_write(AIN2_PIN, PIN_LOW);
     rt_pin_write(BIN1_PIN, PIN_HIGH);
     rt_pin_write(BIN2_PIN, PIN_LOW);
-    rt_pwm_set(pwm1, PWM_CHANNEL1, period, period*25/100); //left
-    rt_pwm_set(pwm2, PWM_CHANNEL2, period, period*40/100); //right
+    my_pwm_enable();
     return 0;
 }
 
 
-int limit =4600;
-int set_left_delay(int argc,char **argv)
-{
-    if(argc != 2)
-    {
-        rt_kprintf("please input car_left angle\r\n");
-        return -RT_ERROR;
-    }
-    else {
-        limit = atoi(argv[1]);
-    }
-    return RT_EOK;
-
-}
-
 int car_right_angle(void)
 {
-      my_pwm_enable();
+
       int level;
       level = rt_hw_interrupt_disable();
       LOG_D("car_turn_right  start\n");
@@ -125,6 +110,7 @@ int car_right_angle(void)
       rt_pin_write(BIN2_PIN, PIN_LOW);
       rt_pwm_set(pwm1, PWM_CHANNEL1, period, period*40/100); //left
       rt_pwm_set(pwm2, PWM_CHANNEL2, period, period*90/100); //right
+      my_pwm_enable();
       for(int i=0;i<3;i++)
       {
           for(int ii=0;ii<2000;ii++)
@@ -139,7 +125,8 @@ int car_right_angle(void)
       LOG_D("car_turn_right over\n");
       return 0;
 }
-
+#if 0
+int limit = 4600;
 int set_right_delay(int argc,char **argv)
 {
     if(argc != 2)
@@ -154,15 +141,33 @@ int set_right_delay(int argc,char **argv)
 
 }
 
+
+int set_left_delay(int argc,char **argv)
+{
+    if(argc != 2)
+    {
+        rt_kprintf("please input car_left angle\r\n");
+        return -RT_ERROR;
+    }
+    else {
+        limit = atoi(argv[1]);
+    }
+    return RT_EOK;
+
+}
+#endif
 int car_left_angle(void)
 {
-      my_pwm_enable();
+      int level;
+      LOG_D("car_turn_left  start\n");
+      level = rt_hw_interrupt_disable();
       rt_pin_write(AIN1_PIN, PIN_HIGH);
       rt_pin_write(AIN2_PIN, PIN_LOW);
       rt_pin_write(BIN1_PIN, PIN_LOW);
       rt_pin_write(BIN2_PIN, PIN_HIGH);
       rt_pwm_set(pwm1, PWM_CHANNEL1, period, period*90/100); //left
       rt_pwm_set(pwm2, PWM_CHANNEL2, period, period*40/100); //right
+      my_pwm_enable();
       for(int i=0;i<3;i++)
       {
           for(int ii=0;ii<2300;ii++)
@@ -173,7 +178,8 @@ int car_left_angle(void)
               }
           }
       }
-      my_pwm_disable();
+      rt_hw_interrupt_enable(level);
+      LOG_D("car_turn_left  over\n");
       return 0;
 }
 
@@ -184,43 +190,7 @@ int car_right(void)
    rt_pwm_set(pwm2,PWM_CHANNEL2,period, period * 15/100);
    return ret;
 }
-extern float right_val;
-extern int ffflag;
-void car_cc_entery(void *parameter)
-{
-    while(1)
-    {
-        rt_kprintf("%d\n",ffflag);
-        if(ffflag==0)
-        {
-            car_forward();
-        }
-        if(right_val>7&&ffflag==1)
-        {
-            ffflag=0;
-            car_right();
-        }
-        else if(right_val<7&&ffflag==1)
-        {
-            ffflag=0;
-            car_left();
-        }
-        rt_thread_mdelay(100);
-    }
-}
 
-rt_thread_t cc_thread;
-void car_cc_init(void)
-{
-    cc_thread = rt_thread_create("cc", car_cc_entery, RT_NULL, 1024, 8, 400);
-    if(cc_thread)
-    {
-        rt_thread_startup(cc_thread);
-    }
-    else {
-        LOG_D("start up cc error\n");
-    }
-}
 
 
 #if CAR_MSH_ENABLE
@@ -230,6 +200,6 @@ MSH_CMD_EXPORT(car_stop,car stop);
 MSH_CMD_EXPORT(car_forward,car forward);
 MSH_CMD_EXPORT(car_left_angle,car_left);
 MSH_CMD_EXPORT(car_right_angle,car_right);
-MSH_CMD_EXPORT(set_left_delay,car_left_delay);
-MSH_CMD_EXPORT(set_right_delay,car_right_delay);
+//MSH_CMD_EXPORT(set_left_delay,car_left_delay);
+//MSH_CMD_EXPORT(set_right_delay,car_right_delay);
 #endif

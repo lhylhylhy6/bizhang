@@ -22,8 +22,6 @@
 #define PWM_CHANNEL2         2
 
 int pwm_init(void);
-int my_pwm_set(int argc,char **argv);
-rt_err_t my_pwm_set_pulse(struct rt_device_pwm * pwm_dev,rt_uint32_t pulse_val);
 rt_err_t my_pwm_enable(void);
 rt_err_t my_pwm_disable(void);
 

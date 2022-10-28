@@ -22,10 +22,9 @@
 extern rt_thread_t straight_pid_thread;
 extern rt_thread_t pid_read_thread;
 extern rt_thread_t mid_hc_thread;
-extern rt_uint32_t number;
-extern int middle;
-extern rt_int32_t pwm_l,pwm_r;
+
 extern int turn_flag;
+
 extern float left_val;
 extern float right_val;
 
