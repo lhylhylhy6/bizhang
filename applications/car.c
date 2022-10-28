@@ -21,7 +21,10 @@
 #define CAR_MSH_ENABLE 1
 
 extern int pulse;
+extern float left_min_val;
+extern float right_min_val;
 
+int stop_flag = 0;
 
 //设置车的基本速度
 int car_set_percent(int argc,char **argv)
@@ -87,8 +90,8 @@ int car_stop(void)
 
 int car_left(void)
 {
-    rt_pwm_set(pwm1, PWM_CHANNEL1, period, period*20/100); //left
-    rt_pwm_set(pwm2, PWM_CHANNEL2, period, period*35/100); //right
+    rt_pwm_set(pwm1, PWM_CHANNEL1, period, period*25/100); //left
+    rt_pwm_set(pwm2, PWM_CHANNEL2, period, period*40/100); //right
     rt_pin_write(AIN1_PIN, PIN_HIGH);
     rt_pin_write(AIN2_PIN, PIN_LOW);
     rt_pin_write(BIN1_PIN, PIN_HIGH);
@@ -102,6 +105,8 @@ int car_right_angle(void)
 {
 
       int level;
+      stop_flag++;
+      LOG_D("stop_flag : !%d!\n",stop_flag);
       level = rt_hw_interrupt_disable();
       LOG_D("car_turn_right  start\n");
       rt_pin_write(AIN1_PIN, PIN_LOW);
@@ -121,6 +126,7 @@ int car_right_angle(void)
               }
           }
       }
+
       rt_hw_interrupt_enable(level);
       LOG_D("car_turn_right over\n");
       return 0;
@@ -165,7 +171,7 @@ int car_left_angle(void)
       rt_pin_write(AIN2_PIN, PIN_LOW);
       rt_pin_write(BIN1_PIN, PIN_LOW);
       rt_pin_write(BIN2_PIN, PIN_HIGH);
-      rt_pwm_set(pwm1, PWM_CHANNEL1, period, period*90/100); //left
+      rt_pwm_set(pwm1, PWM_CHANNEL1, period, period*85/100); //left
       rt_pwm_set(pwm2, PWM_CHANNEL2, period, period*40/100); //right
       my_pwm_enable();
       for(int i=0;i<3;i++)
@@ -178,6 +184,7 @@ int car_left_angle(void)
               }
           }
       }
+
       rt_hw_interrupt_enable(level);
       LOG_D("car_turn_left  over\n");
       return 0;

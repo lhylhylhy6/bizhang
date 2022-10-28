@@ -46,10 +46,13 @@ extern struct rt_device_pwm * pwm1;
 extern struct rt_device_pwm * pwm2;
 extern rt_uint32_t period;
 extern int val_flag;
-
+extern int stop_single;
 float mid_val;
 float left_val=99999;
 float right_val=99999;
+
+float left_min_val=99999;
+float right_min_val=99999;
 
 int turn_flag = 0;
 
@@ -127,7 +130,7 @@ static void hcsr_left_thread_entry(void *parameter)
 
     while(1)
     {
-        if(turn_flag == 0)
+        if(turn_flag == 0||stop_single==1)
         {
             rt_thread_suspend(left_hc_thread);
             rt_schedule();
@@ -156,6 +159,7 @@ static void hcsr_left_thread_entry(void *parameter)
             rt_thread_mdelay(20);
         }
         left_val = S/40.0;
+        left_min_val = left_val<left_min_val?left_val:left_min_val;
         //LOG_D("left : S = %f cm\n",left_val);
 __exit:
         S=0;
@@ -169,7 +173,7 @@ static void hcsr_right_thread_entry(void *parameter)
     int count = 0 ,S = 0,i=0;
     while(1)
     {
-        if(turn_flag==0)
+        if(turn_flag==0||stop_single==1)
         {
             rt_thread_suspend(right_hc_thread);
             rt_schedule();
@@ -200,6 +204,7 @@ static void hcsr_right_thread_entry(void *parameter)
             rt_thread_mdelay(50);
         }
         right_val=S/40.0;
+        right_min_val = right_val<right_min_val?right_val:right_min_val;
         //LOG_D("right : S = %f cm\n",right_val);
 __exti:
         S=0;
