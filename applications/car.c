@@ -114,7 +114,7 @@ int car_right_angle(void)
       rt_pin_write(BIN1_PIN, PIN_HIGH);
       rt_pin_write(BIN2_PIN, PIN_LOW);
       rt_pwm_set(pwm1, PWM_CHANNEL1, period, period*40/100); //left
-      rt_pwm_set(pwm2, PWM_CHANNEL2, period, period*90/100); //right
+      rt_pwm_set(pwm2, PWM_CHANNEL2, period, period*85/100); //right
       my_pwm_enable();
       for(int i=0;i<3;i++)
       {
@@ -165,6 +165,7 @@ int set_left_delay(int argc,char **argv)
 int car_left_angle(void)
 {
       int level;
+      stop_flag++;
       LOG_D("car_turn_left  start\n");
       level = rt_hw_interrupt_disable();
       rt_pin_write(AIN1_PIN, PIN_HIGH);
@@ -176,7 +177,7 @@ int car_left_angle(void)
       my_pwm_enable();
       for(int i=0;i<3;i++)
       {
-          for(int ii=0;ii<2300;ii++)
+          for(int ii=0;ii<2000;ii++)
           {
               for(int iii=0;iii<1000;iii++)
               {
@@ -193,8 +194,13 @@ int car_left_angle(void)
 int car_right(void)
 {
    rt_err_t ret = RT_EOK;
-   rt_pwm_set(pwm1,PWM_CHANNEL1,period, period * 30/100);
-   rt_pwm_set(pwm2,PWM_CHANNEL2,period, period * 15/100);
+   rt_pwm_set(pwm1, PWM_CHANNEL1, period, period*45/100); //left
+   rt_pwm_set(pwm2, PWM_CHANNEL2, period, period*30/100); //right
+   rt_pin_write(AIN1_PIN, PIN_HIGH);
+   rt_pin_write(AIN2_PIN, PIN_LOW);
+   rt_pin_write(BIN1_PIN, PIN_HIGH);
+   rt_pin_write(BIN2_PIN, PIN_LOW);
+   my_pwm_enable();
    return ret;
 }
 

@@ -40,6 +40,7 @@ rt_thread_t mid_hc_thread;
 rt_thread_t left_hc_thread;
 rt_thread_t right_hc_thread;
 
+extern int direction_flag;
 extern rt_thread_t pid_read_thread;
 extern rt_thread_t straight_pid_thread;
 extern struct rt_device_pwm * pwm1;
@@ -103,7 +104,13 @@ static void hcsr_mid_thread_entry(void *parameter)
         if(mid_val<=CMP_MID_VAL)
         {
             turn_flag = 1;
-            car_right_angle();
+            if(direction_flag == 0)
+            {
+                car_left_angle();
+            }
+            else if (direction_flag == 1) {
+                car_right_angle();
+            }
             if(start_single == 0)
             {
                 HCSR_left_init();
