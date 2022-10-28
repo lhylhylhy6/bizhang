@@ -107,12 +107,19 @@ int straight_pid_set(int argc,char **argv)
 MSH_CMD_EXPORT(straight_pid_set,pid parameter set);
 
 
-
+extern int turn_flag;
 rt_uint32_t staraight_num=0;
 void straight_pid_thread_entry(void *parameter)
 {
     while(1)
     {
+        if(turn_flag)
+        {
+             rt_thread_suspend(straight_pid_thread);
+             rt_schedule();
+        }
+
+
         speed = period*pulse/100;
         staraight_num = straight_number;
         straight_dia = 0;

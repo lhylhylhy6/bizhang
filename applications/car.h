@@ -23,6 +23,8 @@ int car_left(void);
 int car_right(void);
 int car_turn(void);
 int car_stop(void);
+int car_left_angle();
+int car_right_angle();
 void car_cc_init(void);
 
 #endif /* APPLICATIONS_CAR_H_ */
