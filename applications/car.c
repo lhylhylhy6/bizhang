@@ -87,8 +87,8 @@ int car_stop(void)
 
 int car_left(void)
 {
-    rt_pwm_set(pwm1, PWM_CHANNEL1, period, period*25/100); //left
-    rt_pwm_set(pwm2, PWM_CHANNEL2, period, period*40/100); //right
+    rt_pwm_set(pwm1, PWM_CHANNEL1, period, period*20/100); //left
+    rt_pwm_set(pwm2, PWM_CHANNEL2, period, period*35/100); //right
     rt_pin_write(AIN1_PIN, PIN_HIGH);
     rt_pin_write(AIN2_PIN, PIN_LOW);
     rt_pin_write(BIN1_PIN, PIN_HIGH);

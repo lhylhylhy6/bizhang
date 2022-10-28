@@ -48,8 +48,8 @@ extern rt_uint32_t period;
 extern int val_flag;
 
 float mid_val;
-float left_val;
-float right_val;
+float left_val=99999;
+float right_val=99999;
 
 int turn_flag = 0;
 
@@ -67,7 +67,7 @@ int HCSR_pin_init(void)
 }
 INIT_APP_EXPORT(HCSR_pin_init);
 
-
+int start_single = 0;
 static void hcsr_mid_thread_entry(void *parameter)
 {
     int count = 0 ,S = 0,i=0;
@@ -100,10 +100,17 @@ static void hcsr_mid_thread_entry(void *parameter)
         if(mid_val<=CMP_MID_VAL)
         {
             turn_flag = 1;
-            car_stop();
             car_right_angle();
-            HCSR_left_init();
-            HCSR_right_init();
+            if(start_single == 0)
+            {
+                HCSR_left_init();
+                HCSR_right_init();
+                start_single = 1;
+            }
+            else if (start_single == 1) {
+                rt_thread_resume(right_hc_thread);
+                rt_thread_resume(left_hc_thread);
+            }
             rt_thread_suspend(mid_hc_thread);
             rt_schedule();
         }
@@ -122,7 +129,7 @@ static void hcsr_left_thread_entry(void *parameter)
     {
         if(turn_flag == 0)
         {
-            rt_thread_suspend(right_hc_thread);
+            rt_thread_suspend(left_hc_thread);
             rt_schedule();
         }
         for(i=0;i<2;i++)

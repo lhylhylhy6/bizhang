@@ -27,6 +27,7 @@ extern int turn_flag;
 
 extern float left_val;
 extern float right_val;
+extern int start_single;
 
 int main(void)
 {
@@ -35,14 +36,34 @@ int main(void)
     straight_pid_init();
     HCSR_mid_init();
     rt_kprintf("init all ok!\r\n");
+    static int m = 0;
+    static int cycle_flag = 0;
+    static int delay_num = 0;
     while (1)
     {
         if(turn_flag==1)
         {
             car_left();
-            if((left_val<=60)&&(right_val<=60))
+            if(cycle_flag==0)
             {
+                delay_num++;
+            }
+            if(delay_num == 40)
+            {
+                cycle_flag = 1;
+                delay_num = 0;
+            }
+            m++;
+            if(m==20)
+            {
+                LOG_D("%f %f\n",left_val,right_val);
+                m=0;
+            }
+            if(((right_val+left_val>=80)&&(right_val+left_val<=120))&&(cycle_flag == 1))
+            {
+                LOG_D("~~~~~~~~~~~~~~~~\n");
                 turn_flag = 0;
+                cycle_flag = 0;
                 car_right_angle();
                 rt_thread_resume(pid_read_thread);
                 rt_thread_resume(straight_pid_thread);
