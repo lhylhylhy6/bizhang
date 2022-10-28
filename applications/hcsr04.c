@@ -15,7 +15,7 @@
  * Change Logs:
  * Date           Author       Notes
  * 2022-10-22     lhylh       the first version
- */
+// */
 #include "hcsr04.h"
 #include "stdlib.h"
 #include "car_pwm.h"
@@ -24,7 +24,7 @@
 #define DBG_LVL DBG_LOG
 #include <rtdbg.h>
 
-#define CMP_MID_VAL     20
+#define CMP_MID_VAL    20
 
 #define EN_MID_HC       1
 #define EN_LEFT_HC      1
@@ -39,7 +39,12 @@
 #define Mid_HC_Trig_Pin         GET_PIN(F,5)
 #define Mid_HC_Echo_Pin         GET_PIN(F,0)
 
+rt_thread_t mid_hc_thread;
+rt_thread_t left_hc_thread;
+rt_thread_t right_hc_thread;
 
+extern rt_thread_t pid_read_thread;
+extern rt_thread_t straight_pid_thread;
 extern struct rt_device_pwm * pwm1;
 extern struct rt_device_pwm * pwm2;
 extern rt_uint32_t period;
@@ -47,7 +52,7 @@ extern int val_flag;
 float mid_val;
 float left_val;
 float right_val;
-int turn_flag=0;
+
 
 int HCSR_pin_init(void)
 {
@@ -63,6 +68,8 @@ int HCSR_pin_init(void)
 }
 INIT_APP_EXPORT(HCSR_pin_init);
 
+
+int turn_flag = 0;
 static void hcsr_mid_thread_entry(void *parameter)
 {
     int count = 0 ,S = 0,i=0;
@@ -94,7 +101,13 @@ static void hcsr_mid_thread_entry(void *parameter)
         //LOG_D("mid : S = %f cm\n",mid_val);
         if(mid_val<=CMP_MID_VAL)
         {
+            turn_flag = 1;
             car_stop();
+            car_right_angle();
+            HCSR_left_init();
+            HCSR_right_init();
+            rt_thread_suspend(mid_hc_thread);
+            rt_schedule();
         }
 __exit:
         S=0;
@@ -109,6 +122,11 @@ static void hcsr_left_thread_entry(void *parameter)
 
     while(1)
     {
+        if(turn_flag == 0)
+        {
+            rt_thread_suspend(right_hc_thread);
+            rt_schedule();
+        }
         for(i=0;i<2;i++)
         {
             rt_pin_write(Left_HC_Trig_Pin,PIN_HIGH);
@@ -146,6 +164,11 @@ static void hcsr_right_thread_entry(void *parameter)
     int count = 0 ,S = 0,i=0;
     while(1)
     {
+        if(turn_flag==0)
+        {
+            rt_thread_suspend(right_hc_thread);
+            rt_schedule();
+        }
         for(i=0;i<2;i++)
         {
             rt_pin_write(Right_HC_Trig_Pin,PIN_HIGH);
@@ -183,7 +206,6 @@ __exti:
 rt_err_t HCSR_left_init(void)
 {
     rt_err_t ree = RT_EOK;
-    rt_thread_t left_hc_thread;
     left_hc_thread = rt_thread_create("left_hc", hcsr_left_thread_entry, RT_NULL, 1024, 15, 150);
     if(left_hc_thread)
     {
@@ -197,9 +219,6 @@ rt_err_t HCSR_mid_init(void)
 {
     rt_err_t ree=RT_EOK;
 
-
-
-    rt_thread_t mid_hc_thread;
     mid_hc_thread = rt_thread_create("mid_hc", hcsr_mid_thread_entry, RT_NULL, 1024, 15, 200);
     if(mid_hc_thread)
     {
@@ -213,7 +232,6 @@ rt_err_t HCSR_mid_init(void)
 rt_err_t HCSR_right_init(void)
 {
     rt_err_t ree = RT_EOK;
-    rt_thread_t right_hc_thread;
     right_hc_thread = rt_thread_create("right_hc", hcsr_right_thread_entry, RT_NULL, 1024,15, 200);
     if(right_hc_thread)
     {

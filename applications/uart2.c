@@ -17,7 +17,7 @@ rt_uint32_t straight_number = 0;
 rt_thread_t pid_read_thread;
 
 
-
+extern int turn_flag;
 rt_err_t pid_uart_rx_inter(rt_device_t dev,rt_size_t size)
 {
     rt_sem_release(rx_sem);
@@ -30,6 +30,12 @@ void pid_read_entry(void *parameter)
       static rt_uint32_t temp_number=0;
       while(1)
      {
+         if(turn_flag)
+         {
+             rt_thread_suspend(pid_read_thread);
+             rt_schedule();
+         }
+
 
          while(rt_device_read(pid_uart, -1, &ch, 1)!=1)
          {
