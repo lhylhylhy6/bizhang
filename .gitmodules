@@ -6,4 +6,4 @@
 	url = https://github.com/mysterywolf/rt_vsnprintf_full.git
 [submodule "packages/sr04-latest"]
 	path = packages/sr04-latest
-	url = D:/diansai/2022/bizhang/packages/sr04-latest/.git
+	url = https://github.com/alec-shan/hc-sr04.git
