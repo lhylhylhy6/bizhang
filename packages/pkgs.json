@@ -8,5 +8,10 @@
   "path": "/packages/peripherals/sensors/mpu6xxx", 
   "ver": "latest", 
   "name": "MPU6XXX"
+ }, 
+ {
+  "path": "/packages/peripherals/sensors/sr04", 
+  "ver": "latest", 
+  "name": "SR04"
  }
 ]

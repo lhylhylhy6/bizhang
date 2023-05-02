@@ -11,124 +11,40 @@
 #include <rtthread.h>
 #include "uart2.h"
 #include "car.h"
-#include "hcsr04.h"
-#include "hc_pid.h"
+#include "car_pwm.h"
+#include "ov_pid.h"
 #include "straight_pid.h"
+
 #define DBG_TAG "main"
 #define DBG_LVL DBG_LOG
 #include <rtdbg.h>
-#include "car_pwm.h"
 
-int stop_single = 0;
-int direction_flag = 0;
-extern rt_thread_t straight_pid_thread;
-extern rt_thread_t pid_read_thread;
-extern rt_thread_t mid_hc_thread;
+#define INT_PIN   GET_PIN(F,3)
 
-extern int turn_flag;
 
-extern float left_val;
-extern float right_val;
-extern float left_min_val;
-extern float right_min_val;
-extern int start_single;
-extern int stop_flag;
+int pin_inter_init(void);
 
-rt_timer_t clear_data;
-rt_timer_t stop_timer;
-void clearn_data_entry(void *parameter)
-{
-    left_min_val=99999;
-    right_min_val=99999;
-}
+rt_uint16_t distance=0;
+extern rt_uint8_t start_flag;
 
-void stop_entry(void *parameter)
-{
-    stop_single = 1;
-}
+extern enum car_state State;
+
+
+
 int main(void)
 {
-    pid_uart_init();
+    //初始化
+    LOG_D("v0.7\r\n");
     car_init();
+    pid_uart_init();
     straight_pid_init();
-    HCSR_mid_init();
-    clear_data = rt_timer_create("clearn", clearn_data_entry, 0, 700, RT_TIMER_FLAG_SOFT_TIMER|RT_TIMER_FLAG_PERIODIC);
-    rt_timer_start(clear_data);
-    stop_timer = rt_timer_create("stop", stop_entry, 0, 6000, RT_TIMER_FLAG_SOFT_TIMER|RT_TIMER_FLAG_ONE_SHOT);
-    rt_kprintf("init all ok 1.3!\r\n");
-    static int m = 0;
-    static int cycle_flag = 0;
-    static int delay_num = 0;
+    rt_thread_mdelay(500);
+    test_init();
+    pin_inter_init();
     while (1)
     {
-
-        if(turn_flag==1)
-        {
-            //LOG_D("--turn_flag now is 1--");
-            if(stop_flag == 5 )
-            {
-               stop_flag=100;
-               rt_timer_start(stop_timer);
-            }
-            if(stop_single == 0)
-            {
-                if(direction_flag==0)
-                {
-                    car_right();
-                }
-                else {
-                    car_left();
-                }
-
-            }
-            else if (stop_single == 1)
-            {
-                stop_single=2;
-                LOG_D("SUCCESS\r\n");
-                car_left_angle();
-                car_forward();
-
-            }
-            if(cycle_flag==0)
-            {
-                delay_num++;
-            }
-            if(delay_num == 40)
-            {
-                cycle_flag = 1;
-                delay_num = 0;
-            }
-            m++;
-            if(m==20)
-            {
-                LOG_D("%f %f\n",left_val,right_val);
-                m=0;
-            }
-            if(((right_min_val+left_val>=60)&&(right_min_val+left_val<=120))&&(cycle_flag == 1))
-            {
-                LOG_D("~~~~~~~~~~~~~~~~\n");
-                turn_flag = 0;
-                //LOG_D("--turn_flag now is 0--");
-                cycle_flag = 0;
-                if(direction_flag == 0)
-                {
-                    car_left_angle();
-                    direction_flag++;
-                    direction_flag %=2;
-                }
-                else if (direction_flag == 1) {
-                    car_right_angle();
-                    direction_flag++;
-                    direction_flag%=2;
-                }
-
-                rt_thread_resume(pid_read_thread);
-                rt_thread_resume(straight_pid_thread);
-                rt_thread_resume(mid_hc_thread);
-                car_forward();
-            }
-        }
-        rt_thread_mdelay(50);
+        //rt_kprintf("%d\r\n",distance);
+        rt_thread_mdelay(1000);
     }
     return RT_EOK;
 }
@@ -138,4 +54,35 @@ int restart(void)
     rt_hw_cpu_reset();
     return RT_EOK;
 }
+
+extern rt_uint8_t return_f;
+extern uint8_t should_stop;
+rt_uint32_t temp_i=0;
+uint16_t pin_level=0;
+void inter_handle(void *args)
+{
+    if(start_flag==1&&return_f==1&&should_stop==1)
+    {
+        temp_i=10;
+        while(temp_i--)
+        {
+            pin_level += rt_pin_read(INT_PIN);
+        }
+        if(pin_level>=8)
+        {
+            State=CAR_STOP;
+            car_stop();
+            rt_kprintf("stop\r\n");
+        }
+        pin_level=0;
+    }
+}
+int pin_inter_init(void)
+{
+    rt_pin_mode(INT_PIN,PIN_MODE_INPUT);
+    rt_pin_attach_irq(INT_PIN, PIN_IRQ_MODE_RISING,inter_handle, RT_NULL);
+    rt_pin_irq_enable(INT_PIN, PIN_IRQ_ENABLE);
+    return 0;
+}
+//INIT_APP_EXPORT(pin_inter_init);
 MSH_CMD_EXPORT(restart , restart);

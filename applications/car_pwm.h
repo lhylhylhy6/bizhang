@@ -21,6 +21,10 @@
 #define PWM_DEVICE_NAME2   "pwm3"
 #define PWM_CHANNEL2         2
 
+#define YUNTAI_PWM             "pwm2"
+#define SP_CHANNEL           1
+#define SZ_CHANNEL           2
+
 int pwm_init(void);
 rt_err_t my_pwm_enable(void);
 rt_err_t my_pwm_disable(void);

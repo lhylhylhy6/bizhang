@@ -169,12 +169,15 @@ extern "C"
  */
 
 /*#define BSP_USING_PWM1*/
-/*#define BSP_USING_PWM2*/
+#define BSP_USING_PWM2
 /*#define BSP_USING_PWM3*/
 #define BSP_USING_PWM3
 #define BSP_USING_PWM3_CH1
 #define BSP_USING_PWM3_CH2
 
+#define BSP_USING_PWM2
+#define BSP_USING_PWM2_CH1
+#define BSP_USING_PWM2_CH2
 /*-------------------------- PWM CONFIG END --------------------------*/
 
 /*-------------------------- ADC CONFIG BEGIN --------------------------*/
@@ -231,9 +234,9 @@ extern "C"
  *
  */
 
-/*#define BSP_USING_TIM*/
+#define BSP_USING_TIM
 #ifdef BSP_USING_TIM
-/*#define BSP_USING_TIM15*/
+#define BSP_USING_TIM1
 /*#define BSP_USING_TIM16*/
 /*#define BSP_USING_TIM17*/
 #endif

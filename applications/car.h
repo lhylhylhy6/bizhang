@@ -12,10 +12,20 @@
 
 #include "car_pwm.h"
 #include <board.h>
-#define AIN1_PIN GET_PIN(F, 6)
-#define AIN2_PIN GET_PIN(F, 7)
-#define BIN1_PIN GET_PIN(F, 8)
-#define BIN2_PIN GET_PIN(F, 9)
+//ch1 a6 //you
+//ch2 a7  /zuo
+//you
+#define AIN1_PIN GET_PIN(F, 5)
+#define AIN2_PIN GET_PIN(F, 6)
+//zuo
+#define BIN1_PIN GET_PIN(F, 7)
+#define BIN2_PIN GET_PIN(F, 8)
+enum car_state{
+    CAR_PID,
+    CAR_TURN,
+    CAR_CIRCLE,
+    CAR_STOP
+};
 
 int car_init(void);
 int car_forward(void);
@@ -26,5 +36,6 @@ int car_stop(void);
 int car_left_angle();
 int car_right_angle();
 
+int test_init(void);
 
 #endif /* APPLICATIONS_CAR_H_ */

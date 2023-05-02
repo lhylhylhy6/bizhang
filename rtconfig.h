@@ -18,7 +18,7 @@
 #define IDLE_THREAD_STACK_SIZE 256
 #define RT_USING_TIMER_SOFT
 #define RT_TIMER_THREAD_PRIO 4
-#define RT_TIMER_THREAD_STACK_SIZE 512
+#define RT_TIMER_THREAD_STACK_SIZE 1024
 
 /* kservice optimization */
 
@@ -83,6 +83,7 @@
 #define RT_USING_SERIAL
 #define RT_USING_SERIAL_V1
 #define RT_SERIAL_RB_BUFSZ 64
+#define RT_USING_HWTIMER
 #define RT_USING_I2C
 #define RT_USING_I2C_BITOPS
 #define RT_USING_PIN
@@ -223,12 +224,21 @@
 
 /* peripheral libraries and drivers */
 
-#define PKG_USING_SENSORS_DRIVERS
+/* sensors drivers */
+
 #define PKG_USING_MPU6XXX
 #define PKG_USING_MPU6XXX_LATEST_VERSION
 #define PKG_USING_MPU6XXX_ACCE
 #define PKG_USING_MPU6XXX_GYRO
 #define PKG_USING_MPU6XXX_MAG
+#define PKG_USING_SR04
+#define PKG_USING_SR04_LATEST_VERSION
+#define PKG_USING_SR04_SAMPLE
+/* end of sensors drivers */
+
+/* touch drivers */
+
+/* end of touch drivers */
 
 /* Kendryte SDK */
 
@@ -238,6 +248,10 @@
 /* AI packages */
 
 /* end of AI packages */
+
+/* Signal Processing and Control Algorithm Packages */
+
+/* end of Signal Processing and Control Algorithm Packages */
 
 /* miscellaneous packages */
 
