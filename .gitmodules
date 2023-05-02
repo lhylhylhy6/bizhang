@@ -1,3 +1,9 @@
 [submodule "mpu6xxx-latest"]
 	path = mpu6xxx-latest
 	url = D:/RT-ThreadStudio/project/bizhang/packages/mpu6xxx-latest/.git
+[submodule "packages/rt_vsnprintf_full-latest/rt_vsnprintf_full"]
+	path = packages/rt_vsnprintf_full-latest/rt_vsnprintf_full
+	url = https://github.com/mysterywolf/rt_vsnprintf_full.git
+[submodule "packages/sr04-latest"]
+	path = packages/sr04-latest
+	url = D:/diansai/2022/bizhang/packages/sr04-latest/.git
